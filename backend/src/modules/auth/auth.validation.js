@@ -1,0 +1,12 @@
+import { z } from "zod";
+
+export const loginSchema = z.object({
+  mobile: z
+    .string()
+    .trim()
+    .regex(/^[6-9]\d{9}$/, "Invalid mobile number"),
+
+  password: z
+    .string()
+    .min(6, "Password must be at least 6 characters"),
+});
