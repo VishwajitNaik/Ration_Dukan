@@ -1215,29 +1215,55 @@ export const getStockRegister = async ({
 
   }
 
-  return {
+    /**
+   * Latest Batch Information
+   */
+  const latestBatch = await StockBatch.findOne({
+    ownerId,
+    isDeleted: false,
+  })
+    .sort({ batchDate: -1, createdAt: -1 })
+    .select("batchDate createdAt");
 
+  // return {
+
+  //   period: {
+
+  //     month: month || null,
+
+  //     year: year || null,
+
+  //     fromDate:
+  //       fromDate || null,
+
+  //     toDate:
+  //       toDate || null,
+
+  //   },
+
+  //   totalCommodities:
+  //     register.length,
+
+  //   register,
+
+  // };
+
+    return {
     period: {
-
       month: month || null,
-
       year: year || null,
-
-      fromDate:
-        fromDate || null,
-
-      toDate:
-        toDate || null,
-
+      fromDate: fromDate || null,
+      toDate: toDate || null,
     },
 
-    totalCommodities:
-      register.length,
+    batchDate: latestBatch?.batchDate || null,
+
+    createdAt: latestBatch?.createdAt || null,
+
+    totalCommodities: register.length,
 
     register,
-
   };
-
 };
 
 /**

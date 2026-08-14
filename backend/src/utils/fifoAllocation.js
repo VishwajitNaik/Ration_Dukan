@@ -44,10 +44,10 @@ export const allocateFIFOStock = async (
     );
 
     allocations.push({
-        batchId: batch._id,
-        quantity: allocateQty,
+      batchId: batch._id,
+      batchNo: batch.batchNo,
+      quantity: allocateQty,
     });
-
     remainingRequired -= allocateQty;
 
     if (remainingRequired === 0) {

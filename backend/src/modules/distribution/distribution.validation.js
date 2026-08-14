@@ -6,6 +6,8 @@ import { z } from "zod";
 const allocationSchema = z.object({
   batchId: z.string().trim(),
 
+  batchNo: z.string().trim().optional(),
+
   quantity: z
     .number()
     .positive("Allocation quantity must be greater than zero"),

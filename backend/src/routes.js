@@ -1,4 +1,4 @@
-import { Router } from "express";
+  import { Router } from "express";
 
 import { successResponse } from "./utils/response.js";
 
@@ -10,6 +10,7 @@ import reportsRoutes from "./modules/reports/reports.routes.js";
 import dashboardRoutes from "./modules/dashboard/dashboard.routes.js";
 import exportRoutes from "./modules/export/export.routes.js";
 import auditRoutes from "./modules/audit/audit.routes.js";
+import entitlementRoutes from "./modules/entitlement/entitlement.routes.js";
 
 
 const router = Router();
@@ -29,86 +30,6 @@ router.use("/reports", reportsRoutes);
 router.use("/dashboard", dashboardRoutes);
 router.use("/export", exportRoutes);
 router.use("/audit", auditRoutes);
+router.use("/entitlements", entitlementRoutes);
 
 export default router;
-
-
-// import { Router } from "express";
-
-// import { successResponse } from "./utils/response.js";
-// import {
-//   hashPassword,
-//   comparePassword,
-// } from "./utils/bcrypt.js";
-// import {
-//   getPagination,
-//   buildPagination,
-// } from "./utils/pagination.js";
-// import {
-//   formatDate,
-//   formatDateTime,
-//   getCurrentMonth,
-//   getCurrentYear,
-//   getCurrentMonthName,
-// } from "./utils/date.js";
-
-// const router = Router();
-
-// router.get("/", (req, res) => {
-//   return successResponse(res, "API Running");
-// });
-
-// router.get("/date", (req, res) => {
-//   return successResponse(
-//     res,
-//     "Date Utility Working",
-//     {
-//       date: formatDate(),
-//       dateTime: formatDateTime(),
-//       month: getCurrentMonth(),
-//       year: getCurrentYear(),
-//       monthName: getCurrentMonthName(),
-//     }
-//   );
-// });
-
-// router.get("/pagination", (req, res) => {
-
-//     const { page, limit, skip } = getPagination(req.query);
-
-//     const pagination = buildPagination(
-//         83,
-//         page,
-//         limit
-//     );
-
-//     return successResponse(
-//         res,
-//         "Pagination Working",
-//         {
-//             skip,
-//             pagination
-//         }
-//     );
-
-// });
-
-// router.get("/bcrypt", async (req, res) => {
-//   const password = "123456";
-
-//   const hash = await hashPassword(password);
-
-//   const matched = await comparePassword(password, hash);
-
-//   return successResponse(
-//     res,
-//     "Bcrypt Working",
-//     {
-//       password,
-//       hash,
-//       matched,
-//     }
-//   );
-// });
-
-// export default router;

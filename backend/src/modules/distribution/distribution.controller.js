@@ -3,6 +3,8 @@ import {
   successResponse,
   errorResponse,
 } from "../../utils/response.js";
+import Distribution from "./distribution.model.js";
+import StockBatch from "../stock/stock.model.js";
 
 import {
   createDistribution,
@@ -470,9 +472,6 @@ export const deleteDistributionController = async (
   }
 };
 
-/**
- * Get Single Distribution
- */
 export const getDistribution = async (
   req,
   res,
@@ -480,18 +479,72 @@ export const getDistribution = async (
 ) => {
   try {
 
+ const distributionDoc =
+  await findById(
+    req.owner._id,
+    req.params.id
+  );
+
+if (!distributionDoc) {
+  return errorResponse(
+    res,
+    "Distribution not found",
+    404
+  );
+}
+
     const distribution =
-      await findById(
-        req.owner._id,
-        req.params.id
+      distributionDoc.toObject();   
+
+    /**
+     * Collect batch ids from allocations
+     */
+    const batchIds =
+      distribution.items.flatMap((item) =>
+        item.allocations
+          .map((a) => a.batchId)
+          .filter(Boolean)
       );
 
-    if (!distribution) {
-      return errorResponse(
-        res,
-        "Distribution not found",
-        404
-      );
+    if (batchIds.length > 0) {
+
+      const batches =
+        await StockBatch.find({
+          _id: { $in: batchIds },
+        }).select("_id batchNo");
+
+      const batchMap =
+        Object.fromEntries(
+          batches.map((b) => [
+            String(b._id),
+            b.batchNo,
+          ])
+        );
+
+      /**
+       * Attach batchNo to old records
+       */
+      distribution.items.forEach((item) => {
+        item.allocations.forEach(
+          (allocation) => {
+
+            const id =
+              allocation.batchId
+                ? String(
+                    allocation.batchId
+                  )
+                : null;
+
+            allocation.batchNo =
+              allocation.batchNo ||
+              (id
+                ? batchMap[id]
+                : null);
+
+          }
+        );
+      });
+
     }
 
     return successResponse(
@@ -787,32 +840,50 @@ export const getMonthlyReportController = async (
   }
 };
 
-/**
- * Yearly Report
- */
-export const getYearlyReportController = async (
-  req,
-  res,
-  next
-) => {
+export const getYearlyReportController = async (req, res, next) => {
   try {
+    const year = Number(req.query.year || new Date().getFullYear());
 
-    const {
-      year,
-    } = req.validatedData;
+    const months = [];
 
-    const report =
-      await getYearlyReport(
-        req.owner._id,
-        year
-      );
+    for (let month = 1; month <= 12; month++) {
+      const distributions = await Distribution.find({
+        ownerId: req.owner._id,
+        year,
+        month,
+        isDeleted: false,
+      });
+
+      const totalDistributions = distributions.length;
+
+      const cardSet = new Set();
+      const commodities = {};
+
+      for (const distribution of distributions) {
+        cardSet.add(
+          distribution.rationCardId.toString()
+        );
+
+        for (const item of distribution.items) {
+          commodities[item.commodity] =
+            (commodities[item.commodity] || 0) +
+            item.quantity;
+        }
+      }
+
+      months.push({
+        month,
+        totalCards: cardSet.size,
+        totalDistributions,
+        commodities,
+      });
+    }
 
     return successResponse(
       res,
       "Yearly report fetched successfully",
-      report
+      { year, months }
     );
-
   } catch (error) {
     next(error);
   }

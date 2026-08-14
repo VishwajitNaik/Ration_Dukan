@@ -691,9 +691,6 @@ export const getTodayReport = async (
 /**
  * Monthly Report
  */
-/**
- * Monthly Report
- */
 export const getMonthlyReport = async (
   ownerId,
   month,
@@ -796,9 +793,6 @@ export const getMonthlyReport = async (
 /**
  * Yearly Report
  */
-/**
- * Yearly Report
- */
 export const getYearlyReport = async (
   ownerId,
   year
@@ -894,9 +888,7 @@ export const getYearlyReport = async (
 
 };
 
-/**
- * Commodity Report
- */
+
 /**
  * Commodity Report
  */
